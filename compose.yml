@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+
+  poll:
+    build: ./poll
+    depends_on:
+      - redis
+    ports:
+      - "5000:80"
+    networks:
+      - poll-tier
+    restart: always
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - poll-tier
+      - back-tier
+    restart: always
+
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+      - db
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    
+    
+  db:
+    image: postgres:15-alpine
+    networks:
+      - back-tier
+      - result-tier
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+
+
+
+  result:
+    build: ./result
+    depends_on:
+      - db
+    ports:
+      - "5001:80"
+    networks:
+      - result-tier
+    restart: always
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+
+networks:
+  poll-tier:
+  back-tier:
+  result-tier:
+
+volumes:
+  db-data:
+
+
+#docker compose up --build
+#http://localhost:5000 poll
+#http://localhost:5001 result
