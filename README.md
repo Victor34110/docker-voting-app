@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docker.gif" width="220" alt="Docker Whale" />
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Docker-Containerization-blue?style=for-the-badge&logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/DevOps-Microservices-black?style=for-the-badge" />
